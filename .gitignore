@@ -1,0 +1,17 @@
+# dir 不需要提交的目录
+MDK-ARM/.vscode
+MDK-ARM/DebugConfig
+MDK-ARM/startup_stm32f103xb.lst
+MDK-ARM/UAV
+MDK-ARM/UAV.uvguix.AuCuAl
+MDK-ARM/UAV.uvguix.10627
+​
+# file 不需要提交的文件
+// config.ini
+​
+# log 不需要提交的任意包含后缀名为log的文件
+// *.log
+​
+# Package Files 不需要提交的任意包含后缀名为jar的文件
+// *.jar
+
