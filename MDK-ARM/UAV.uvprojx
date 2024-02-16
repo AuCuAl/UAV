@@ -81,7 +81,7 @@
           </BeforeMake>
           <AfterMake>
             <RunUserProg1>0</RunUserProg1>
-            <RunUserProg2>1</RunUserProg2>
+            <RunUserProg2>0</RunUserProg2>
             <UserProg1Name></UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../user/device;../user/support</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../user/device;../user/support;..\user\eMPL</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -864,6 +864,41 @@
               <FileName>motor.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\user\device\motor.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eMPL</GroupName>
+          <Files>
+            <File>
+              <FileName>dmpKey.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\user\eMPL\dmpKey.h</FilePath>
+            </File>
+            <File>
+              <FileName>dmpmap.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\user\eMPL\dmpmap.h</FilePath>
+            </File>
+            <File>
+              <FileName>inv_mpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\eMPL\inv_mpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>inv_mpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\user\eMPL\inv_mpu.h</FilePath>
+            </File>
+            <File>
+              <FileName>inv_mpu_dmp_motion_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\eMPL\inv_mpu_dmp_motion_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>inv_mpu_dmp_motion_driver.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\user\eMPL\inv_mpu_dmp_motion_driver.h</FilePath>
             </File>
           </Files>
         </Group>

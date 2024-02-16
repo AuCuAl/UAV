@@ -25,7 +25,9 @@
 #include "pid.h"
 #include "motor.h"
 #include "mpu6050.h"
-
+#include "inv_mpu.h"
+#include "inv_mpu_dmp_motion_driver.h"
+#include <stdio.h>
 
 
 /* Private includes ----------------------------------------------------------*/
@@ -51,7 +53,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+float roll,pitch,yaw;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -102,8 +104,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_4);
-  MPU_6050_Init();
-  MPU6050_calibrate();
+ 
   PID pid_roll;
   PID pid_pitch;
 
@@ -116,13 +117,45 @@ PID_Init(&pid_pitch, 20.0, 0, 0, 100, 1000);
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+    printf("-- Mpu6050 Project Start -- \r\n");
+	HAL_Delay(1000);
+	/*
+   *DMP初始化，
+   */
+	while (mpu_dmp_init())
+  {
+    HAL_Delay(200);
+  }
+	printf("Successfully initialized!\r\n");
+	/*
+   *iic读取器件ID ，测试IIC能否使用，测试一下
+   */
+	printf ("Ready to read the ID\r\n");
+  uint8_t recv = 0x00;
+  HAL_I2C_Mem_Read(&hi2c1, (0x68 << 1), 0x75, I2C_MEMADD_SIZE_8BIT, &recv, 1, 0xfff);
+  if (recv == 0x68)
+  {
+    printf("mpu6050 ID Read: OK at 0x68\r\n");  //成功
+  }
+  else
+  {
+    printf("Err mpu id:0x%x\r\n", recv);   //失败
+  }
+  /* USER CODE END 2 */
+ 
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-	  printf("%f",gx);
-   text(&pid_roll,&pid_pitch);
+		while(mpu_dmp_get_data(&pitch, &roll, &yaw) != 0);  //获取欧拉角的参数
+		printf("%f,%f,%f\r\n", pitch, roll, yaw); 					//打印到串口上
+		
+		HAL_Delay(500);
     /* USER CODE BEGIN 3 */
   }
+
+
   /* USER CODE END 3 */
 }
 

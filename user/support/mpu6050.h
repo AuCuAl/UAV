@@ -1,83 +1,154 @@
-#ifndef _MPU6050_H
-#define __MPU6050_H
+#ifndef __MPU6050_H
+#define __MPU6050_H											  	  
 
-#include  "main.h"
-#include  "i2c.h"
+#include "i2c.h"
 
-#define  MPU6050_Write_Addr           0xD0      //默认状态 地址为0X69 只有六位数据 使用IC7位寻址  ，第七位根据MPU6050引脚AD0在判断  AD0=0 第七位0  AD0=1 第七位1   第八位I2C读1 写0  我这里使用AD0=0低电平
-#define  MPU6050_Read_Addr            0xD1
-#define  MPU_Out_Fre_DIV_Addr         0x19      //采样频率地址   默认8Khz  如果开了低通滤波器 则变为1Khz
-#define  MPU_Dlpf_Addr                0x1A		//低通滤波器地址 
-#define  MPU_Gyro_Addr			      0x1B		//陀螺仪数据地址    第八七六位  XYZ轴自检给1  不自检给0  第五四两位 用于给陀螺仪量程范围  00-0~250  01-0~500 10-0~1000  11-0~2000  其余位0
-#define  MPU_Accel_Addr               0x1C		//加速计数据地址    第八七六位  XYZ轴自检给1  不自检给0  第五四两位 用于给陀螺仪量程范围  00-±2G   01-±4G 	10-±8G  	 11-±16G 其余位0
-#define  MPU_Id_Addr                  0x75      //MPU ID的地址
-#define  MPU_Int_Addr				  0X38		//mpu中断使能地址
-#define  MPU_User_Addr				  0x6A      //MPU用户控制地址  用于控制FIFO  I2C主模式
-#define  MPU_Fifo_En_Addr			  0x23		//MPU的FIFO使能地址
-#define  MPU_Int_Pin_Addr			  0x37      //INT中断地址
-#define  PowerMem_Register1_Addr      0x6B		//电源管理1的地址
-#define  PowerMem_Register2_Addr      0x6C		//电源管理2的地址
+#define u8 uint8_t
+#define u16 uint16_t
+
+//////////////////////////////////////////////////////////////////////////////////	 
+//本程序只供学习使用，未经作者许可，不得用于其它任何用途
+//ALIENTEK MiniSTM32F103开发板
+//MPU6050 驱动代码	   
+//正点原子@ALIENTEK
+//技术论坛:www.openedv.com
+//创建日期:2015/4/18
+//版本：V1.0
+//版权所有，盗版必究。
+//Copyright(C) 广州市星翼电子科技有限公司 2009-2019
+//All rights reserved									  
+////////////////////////////////////////////////////////////////////////////////// 
+  
+//#define MPU_ACCEL_OFFS_REG		0X06	//accel_offs寄存器,可读取版本号,寄存器手册未提到
+//#define MPU_PROD_ID_REG			0X0C	//prod id寄存器,在寄存器手册未提到
+#define MPU_SELF_TESTX_REG		0X0D	//自检寄存器X
+#define MPU_SELF_TESTY_REG		0X0E	//自检寄存器Y
+#define MPU_SELF_TESTZ_REG		0X0F	//自检寄存器Z
+#define MPU_SELF_TESTA_REG		0X10	//自检寄存器A
+#define MPU_SAMPLE_RATE_REG		0X19	//采样频率分频器
+#define MPU_CFG_REG				0X1A	//配置寄存器
+#define MPU_GYRO_CFG_REG		0X1B	//陀螺仪配置寄存器
+#define MPU_ACCEL_CFG_REG		0X1C	//加速度计配置寄存器
+#define MPU_MOTION_DET_REG		0X1F	//运动检测阀值设置寄存器
+#define MPU_FIFO_EN_REG			0X23	//FIFO使能寄存器
+#define MPU_I2CMST_CTRL_REG		0X24	//IIC主机控制寄存器
+#define MPU_I2CSLV0_ADDR_REG	0X25	//IIC从机0器件地址寄存器
+#define MPU_I2CSLV0_REG			0X26	//IIC从机0数据地址寄存器
+#define MPU_I2CSLV0_CTRL_REG	0X27	//IIC从机0控制寄存器
+#define MPU_I2CSLV1_ADDR_REG	0X28	//IIC从机1器件地址寄存器
+#define MPU_I2CSLV1_REG			0X29	//IIC从机1数据地址寄存器
+#define MPU_I2CSLV1_CTRL_REG	0X2A	//IIC从机1控制寄存器
+#define MPU_I2CSLV2_ADDR_REG	0X2B	//IIC从机2器件地址寄存器
+#define MPU_I2CSLV2_REG			0X2C	//IIC从机2数据地址寄存器
+#define MPU_I2CSLV2_CTRL_REG	0X2D	//IIC从机2控制寄存器
+#define MPU_I2CSLV3_ADDR_REG	0X2E	//IIC从机3器件地址寄存器
+#define MPU_I2CSLV3_REG			0X2F	//IIC从机3数据地址寄存器
+#define MPU_I2CSLV3_CTRL_REG	0X30	//IIC从机3控制寄存器
+#define MPU_I2CSLV4_ADDR_REG	0X31	//IIC从机4器件地址寄存器
+#define MPU_I2CSLV4_REG			0X32	//IIC从机4数据地址寄存器
+#define MPU_I2CSLV4_DO_REG		0X33	//IIC从机4写数据寄存器
+#define MPU_I2CSLV4_CTRL_REG	0X34	//IIC从机4控制寄存器
+#define MPU_I2CSLV4_DI_REG		0X35	//IIC从机4读数据寄存器
+
+#define MPU_I2CMST_STA_REG		0X36	//IIC主机状态寄存器
+#define MPU_INTBP_CFG_REG		0X37	//中断/旁路设置寄存器
+#define MPU_INT_EN_REG			0X38	//中断使能寄存器
+#define MPU_INT_STA_REG			0X3A	//中断状态寄存器
+
+#define MPU_ACCEL_XOUTH_REG		0X3B	//加速度值,X轴高8位寄存器
+#define MPU_ACCEL_XOUTL_REG		0X3C	//加速度值,X轴低8位寄存器
+#define MPU_ACCEL_YOUTH_REG		0X3D	//加速度值,Y轴高8位寄存器
+#define MPU_ACCEL_YOUTL_REG		0X3E	//加速度值,Y轴低8位寄存器
+#define MPU_ACCEL_ZOUTH_REG		0X3F	//加速度值,Z轴高8位寄存器
+#define MPU_ACCEL_ZOUTL_REG		0X40	//加速度值,Z轴低8位寄存器
+
+#define MPU_TEMP_OUTH_REG		0X41	//温度值高八位寄存器
+#define MPU_TEMP_OUTL_REG		0X42	//温度值低8位寄存器
+
+#define MPU_GYRO_XOUTH_REG		0X43	//陀螺仪值,X轴高8位寄存器
+#define MPU_GYRO_XOUTL_REG		0X44	//陀螺仪值,X轴低8位寄存器
+#define MPU_GYRO_YOUTH_REG		0X45	//陀螺仪值,Y轴高8位寄存器
+#define MPU_GYRO_YOUTL_REG		0X46	//陀螺仪值,Y轴低8位寄存器
+#define MPU_GYRO_ZOUTH_REG		0X47	//陀螺仪值,Z轴高8位寄存器
+#define MPU_GYRO_ZOUTL_REG		0X48	//陀螺仪值,Z轴低8位寄存器
+
+#define MPU_I2CSLV0_DO_REG		0X63	//IIC从机0数据寄存器
+#define MPU_I2CSLV1_DO_REG		0X64	//IIC从机1数据寄存器
+#define MPU_I2CSLV2_DO_REG		0X65	//IIC从机2数据寄存器
+#define MPU_I2CSLV3_DO_REG		0X66	//IIC从机3数据寄存器
+
+#define MPU_I2CMST_DELAY_REG	0X67	//IIC主机延时管理寄存器
+#define MPU_SIGPATH_RST_REG		0X68	//信号通道复位寄存器
+#define MPU_MDETECT_CTRL_REG	0X69	//运动检测控制寄存器
+#define MPU_USER_CTRL_REG		0X6A	//用户控制寄存器
+#define MPU_PWR_MGMT1_REG		0X6B	//电源管理寄存器1
+#define MPU_PWR_MGMT2_REG		0X6C	//电源管理寄存器2 
+#define MPU_FIFO_CNTH_REG		0X72	//FIFO计数寄存器高八位
+#define MPU_FIFO_CNTL_REG		0X73	//FIFO计数寄存器低八位
+#define MPU_FIFO_RW_REG			0X74	//FIFO读写寄存器
+#define MPU_DEVICE_ID_REG		0X75	//器件ID寄存器
+ 
+//如果AD0脚(9脚)接地,IIC地址为0X68(不包含最低位).
+//如果接V3.3,则IIC地址为0X69(不包含最低位).
+#define MPU_ADDR				0X68
+
+
+////因为模块AD0默认接GND,所以转为读写地址后,为0XD1和0XD0(如果接VCC,则为0XD3和0XD2)  
+//#define MPU_READ    0XD1
+//#define MPU_WRITE   0XD0
+
+u8 MPU_Init(void); 								//初始化MPU6050
+u8 MPU_Write_Len(u8 addr,u8 reg,u8 len,u8 *buf);//IIC连续写
+u8 MPU_Read_Len(u8 addr,u8 reg,u8 len,u8 *buf); //IIC连续读 
+u8 MPU_Write_Byte(u8 reg,u8 data);				//IIC写一个字节
+u8 MPU_Read_Byte(u8 reg);						//IIC读一个字节
+
+u8 MPU_Set_Gyro_Fsr(u8 fsr);
+u8 MPU_Set_Accel_Fsr(u8 fsr);
+u8 MPU_Set_LPF(u16 lpf);
+u8 MPU_Set_Rate(u16 rate);
+u8 MPU_Set_Fifo(u8 sens);
+
+
+short MPU_Get_Temperature(void);
+u8 MPU_Get_Gyroscope(short *gx,short *gy,short *gz);
+u8 MPU_Get_Accelerometer(short *ax,short *ay,short *az);
+
+uint8_t DMP_Write_Len(uint8_t addr, uint8_t reg,uint8_t len,uint8_t *buf);
+uint8_t DMP_Read_Len(uint8_t addr, uint8_t reg,uint8_t len,uint8_t *buf);
+
+#endif
 
 
 
 
 
-#define  Set_PowerMen_Reset           0x80		//在电源管理 输入 这个数据 为MPU 复位
-#define  Set_PowerMen_Start_XPPL	  0x01      //在电源管理 输入 这个数据 为MPU唤醒 且使用X轴的时钟源
-#define  Set_Smplrt_Div				  0x00      //采样分频
-#define  Set_Dlpf_Div				  0x00      //低通滤波器模式
-#define  Set_Gyro_Range               0x11      //设置陀螺仪的量程范围
-#define  Set_Accel_Range              0x00      //设置加速计的量程范围
-#define  Set_Int_Enable				  0x00      //设置关闭全部中断
-#define  Set_User_I2c				  0x00		//禁止FIFO  I2C主模式
-#define  Set_Fifo_Enable			  0x00      //禁止FIFO模式
-#define  Set_Int_Pin_L				  0x80      //INT脚低电平有效
-#define  Sat_Start_Mpu				  0x00		//设置启动MPU陀螺仪
-
-//加速度计 数据寄存器地址
-#define ACCEL_Xout_H				  0x3B
-#define ACCEL_Xout_L				  0x3C
-#define ACCEL_Yout_H				  0x3D
-#define ACCEL_Yout_L  				  0x3E
-#define ACCEL_Zout_H				  0x3F
-#define ACCEL_Zout_L				  0x40
-
-//陀螺仪  数据寄存器地址
-#define GYRO_Xout_H					  0x43
-#define GYRO_Xout_L					  0x44
-#define GYRO_Yout_H				      0x45
-#define GYRO_Yout_L					  0x46
-#define GYRO_Zout_H					  0x47
-#define GYRO_Zout_L					  0x48
 
 
-extern signed short ax;
-extern signed short ay;
-extern signed short az;
-
-extern signed short gx;
-extern signed short gy;
-extern signed short gz;
-
-extern signed short ax_l;
-extern signed short ay_l;
-extern signed short az_l;
-
-extern signed short gx_l;
-extern signed short gy_l;
-extern signed short gz_l;
-
-void I2C_Write(unsigned char dev_addr,unsigned char mem_addr , unsigned char data);
-void I2C_Read(unsigned char dev_addr,unsigned char mem_addr , unsigned char *buf,unsigned char len);
-void MPU_Set_LPF(uint16_t lpf);
-void Set_Mpu_Rate(uint16_t rata);
-void MPU_6050_Init(void);
-void Read_Mpu_Gyro(void);
-void Read_Mpu_Accel(void);
-void MPU6050_calibrate(void);
 
 
-#endif 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
