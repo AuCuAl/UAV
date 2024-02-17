@@ -119,7 +119,7 @@ int main(void)
 	HAL_Delay(1000);
 	/*
 	 *DMP初始化，
-	 *好的TOO
+	 *好的TOO！！！
 	 */
 	while (mpu_dmp_init())
 	{
@@ -128,7 +128,7 @@ int main(void)
 	printf("Successfully initialized!\r\n");
 	/*
 	 *iic读取器件ID ，测试IIC能否使用，测试一下
-	 *好的TOO
+	 *好的TOO！！！
 	 */
 	printf("Ready to read the ID\r\n");
 	uint8_t recv = 0x00;
